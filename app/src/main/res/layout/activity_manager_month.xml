@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".activity.ManagermonthActivity">
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/backgroundimg">
+
+
+
+        <ImageView
+            android:id="@+id/logo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/logo"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:layout_marginTop="65dp"
+            android:layout_marginLeft="120dp"/>
+
+        <LinearLayout
+            android:id="@+id/frameCaleandar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/logo"
+            android:layout_marginTop="50dp"
+            android:layout_marginLeft="100dp"
+            android:layout_marginRight="100dp"
+            android:orientation="vertical"
+            android:background="@drawable/caleandarborder"
+            >
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_month"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="12월"
+                        android:textColor="@color/black"
+                        android:textSize="55sp"
+                        android:layout_marginLeft="47dp"
+                        android:gravity="center|left"
+                        android:layout_weight="0.3"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/textView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="2022년 12월 25일 화요일"
+                        android:textSize="23sp"
+                        android:textColor="@color/datecolor"
+                        app:layout_constraintStart_toStartOf="@+id/tv_month"
+                        app:layout_constraintTop_toBottomOf="@+id/tv_month"
+                        android:layout_marginLeft="47dp"/>
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.4"/>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.3"
+                    android:orientation="horizontal">
+
+                    <View
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.1"
+                        />
+
+                    <ImageButton
+                        android:id="@+id/preBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:background="@drawable/prebtn"
+                        android:layout_marginBottom="9dp"/>
+
+                    <View
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content"/>
+
+                    <ImageButton
+                        android:id="@+id/nextBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:background="@drawable/nextbtn"
+                        android:layout_marginBottom="9dp"/>
+
+                    <View
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.1"/>
+
+
+
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="일"
+                    android:layout_weight="1"
+                    android:textAlignment="center"
+                    android:textColor="@color/sunday"
+                    android:textSize="40sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="월"
+                    android:layout_weight="1"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textSize="40sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="화"
+                    android:layout_weight="1"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textSize="40sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="수"
+                    android:layout_weight="1"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textSize="40sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="목"
+                    android:layout_weight="1"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textSize="40sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="금"
+                    android:layout_weight="1"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textSize="40sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="토"
+                    android:layout_weight="1"
+                    android:textAlignment="center"
+                    android:textColor="@color/saturday"
+                    android:textSize="40sp"
+                    android:textStyle="bold" />
+
+
+
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/caleandar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginBottom="40dp"/>
+
+
+
+        </LinearLayout>
+
+
+
+        <TextView
+            android:id="@+id/monthSales"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:text="월 매출"
+            android:textSize="30sp"
+            app:layout_constraintStart_toStartOf="@+id/frameCaleandar"
+            app:layout_constraintTop_toBottomOf="@+id/frameCaleandar"
+            android:layout_marginTop="50dp"
+            android:layout_marginLeft="50dp"/>
+
+        <TextView
+            android:id="@+id/monthMoney"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/moneyColor"
+            android:text=""
+            android:textSize="80sp"
+            app:layout_constraintStart_toStartOf="@+id/monthSales"
+            app:layout_constraintTop_toBottomOf="@+id/monthSales" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginBottom="12dp"
+            android:text="원"
+            android:textColor="@color/moneyColor"
+            android:textSize="40sp"
+            app:layout_constraintBottom_toBottomOf="@+id/monthMoney"
+            app:layout_constraintLeft_toRightOf="@+id/monthMoney" />
+
+        <View
+            android:id="@+id/moneyLine"
+            android:layout_width="550dp"
+            android:layout_height="1dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginRight="300dp"
+            android:background="@color/linecolor"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/monthMoney"
+            app:layout_constraintTop_toBottomOf="@id/monthMoney" />
+
+        <TextView
+            android:id="@+id/todaySales"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="오늘 매출"
+            android:textColor="@color/black"
+            android:textSize="30sp"
+            app:layout_constraintLeft_toLeftOf="@+id/monthMoney"
+            app:layout_constraintTop_toBottomOf="@+id/moneyLine"
+            android:layout_marginTop="50dp"/>
+
+
+
+        <TextView
+            android:id="@+id/todayMoney"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="@color/moneyColor"
+            android:textSize="80sp"
+            app:layout_constraintLeft_toLeftOf="@+id/todaySales"
+            app:layout_constraintTop_toBottomOf="@+id/todaySales"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="원"
+            android:textColor="@color/moneyColor"
+            android:textSize="40sp"
+            app:layout_constraintBottom_toBottomOf="@+id/todayMoney"
+            app:layout_constraintLeft_toRightOf="@+id/todayMoney"
+            android:layout_marginBottom="12dp"
+            android:layout_marginLeft="10dp"/>
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>
