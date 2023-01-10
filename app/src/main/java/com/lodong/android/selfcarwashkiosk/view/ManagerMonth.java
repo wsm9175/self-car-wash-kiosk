@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -153,6 +154,8 @@ public class ManagerMonth extends AppCompatActivity implements OnItemListener {
         @SuppressLint({"NewApi", "LocalSuppress"}) int dayOfWeek = firstDay.getDayOfWeek().getValue();
 
         int start = 0;
+
+        Log.d("TAG", "setDateMoney: dayOfWeek확인" + dayOfWeek);
 
         switch (dayOfWeek){
             case 7:

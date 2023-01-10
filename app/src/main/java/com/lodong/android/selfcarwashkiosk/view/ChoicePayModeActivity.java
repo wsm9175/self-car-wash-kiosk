@@ -1,10 +1,18 @@
 package com.lodong.android.selfcarwashkiosk.view;
 
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+import static com.lodong.android.selfcarwashkiosk.outApp.Util.insertBytes;
+import static com.lodong.android.selfcarwashkiosk.outApp.Util.recreatePacketByApprovalFormat;
+import static com.lodong.android.selfcarwashkiosk.outApp.Util.recreatePacketBySubFuncFormat;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
+import android.content.ComponentName;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.lodong.android.selfcarwashkiosk.R;
 import com.lodong.android.selfcarwashkiosk.databinding.ActivityChoicePayModeBinding;
@@ -18,6 +26,9 @@ public class ChoicePayModeActivity extends AppCompatActivity {
     private ActivityChoicePayModeBinding binding;
     private TouchTimer touchTimer;
     private Timer timer;
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,6 +38,8 @@ public class ChoicePayModeActivity extends AppCompatActivity {
         settingClickListener();
         //집중모드
         Util.hideNavigationView(this);
+
+
     }
 
     private void settingClickListener(){
@@ -65,5 +78,8 @@ public class ChoicePayModeActivity extends AppCompatActivity {
         startActivity(intent);
         timer.cancel();
     }
+
+
+
 
 }

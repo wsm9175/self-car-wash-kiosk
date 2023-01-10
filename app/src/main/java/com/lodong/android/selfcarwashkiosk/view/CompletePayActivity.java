@@ -20,8 +20,10 @@ import com.bxl.config.editor.BXLConfigLoader;
 import com.lodong.android.selfcarwashkiosk.Print.BixolonPrinter;
 import com.lodong.android.selfcarwashkiosk.R;
 import com.lodong.android.selfcarwashkiosk.databinding.ActivityCompletePayBinding;
+import com.lodong.android.selfcarwashkiosk.outApp.TransactionData;
 import com.lodong.android.selfcarwashkiosk.util.Util;
 
+import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -36,6 +38,34 @@ public class CompletePayActivity extends AppCompatActivity {
     private final int portType = BXLConfigLoader.DEVICE_BUS_USB;
     private final String logicalName = "BK3-3";
     private final String address = "";
+
+    // 영수증 데이터 얻어오기
+    byte[] mResData;
+    TransactionData trData;
+    String mTotAmt = "";
+    String mVat = "";
+    String mSupAmt = "";
+    String mPersonalNo = "";
+    String mTraderType = "";
+    String mPayType = "";
+
+    // 카드 번호
+    String cardNum;
+
+    // 카드 명칭
+    String cardCategory;
+
+    // 매입사명
+    String purchaseCompany;
+
+    // 단말번호
+    String deviceNumber;
+
+    // 가맹번호
+    String merchantNumber;
+
+    // 승인번호
+    String approvalNumber;
 
 
     @Override
@@ -55,13 +85,13 @@ public class CompletePayActivity extends AppCompatActivity {
                 }
             }
         }
+        setBxlPrinter();
 
         //집중모드
         Util.hideNavigationView(this);
 
 
 
-        setBxlPrinter();
     }
 
     public void setBxlPrinter(){
@@ -115,6 +145,12 @@ public class CompletePayActivity extends AppCompatActivity {
 
         int alignment, attribute = 0;
 
+        try {
+            makeReceiptData();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
 
         alignment = BixolonPrinter.ALIGNMENT_CENTER;
 //        attribute = BixolonPrinter.ATTRIBUTE_FONT_A;
@@ -128,7 +164,7 @@ public class CompletePayActivity extends AppCompatActivity {
         String dateStr = getDate();
         String receiptDate = getReceiptDate(dateStr);
 
-        strData = "\n[매장명]  워시큐브  목포센터\n" +
+        strData = "\n[매장명]  워시큐브  목포센터/537-87-01157\n" +
                 "[주소]    전남  목포시 영산로 792\n" +
                 "[대표자]  이름   [TEL] 061-282-3782\n" +
                 "[매출일]  " + dateStr +"\n"+
@@ -157,12 +193,14 @@ public class CompletePayActivity extends AppCompatActivity {
 
         bxlPrinter.printText(strData, alignment, attribute, 1);
 
-        strData = "카드/매입사: \n" + /* 데이터 받아오기*/
-                "카 드 번 호: \n" + /* 데이터 받아오기*/
+
+
+        strData = "카드/매입사: "+ cardCategory + " / " + purchaseCompany + "\n" + /* 데이터 받아오기*/
+                "카 드 번 호: " + cardNum + " \n" + /* 데이터 받아오기*/
                 "승 인 금 액: 13,000(일시불)\n" +
-                "승인/가맹점:\n" + /* 데이터 받아오기*/
+                "승인/가맹점: " + approvalNumber + " / " + merchantNumber + "\n" + /* 데이터 받아오기*/
                 "승 인 일 시: " + date + "\n" + /* 데이터 받아오기*/
-                "단말기 번호: " + deviceNo + "\n" + /* 데이터 받아오기*/
+                "단말기 번호: " + deviceNumber + "\n" + /* 데이터 받아오기*/
                 "     NOTICE:  무서명거래\n" +
                 "---------------------------------------------";
 
@@ -178,7 +216,6 @@ public class CompletePayActivity extends AppCompatActivity {
                 " [ 영 수 증 ] \n";
 
         int alignment, attribute = 0;
-
 
         alignment = BixolonPrinter.ALIGNMENT_CENTER;
 //        attribute = BixolonPrinter.ATTRIBUTE_FONT_A;
@@ -237,8 +274,6 @@ public class CompletePayActivity extends AppCompatActivity {
 
     public void intentPrint(){
 
-
-
         lastPrint();
 
     }
@@ -259,7 +294,42 @@ public class CompletePayActivity extends AppCompatActivity {
         }
     }
 
-    //public Date getDate();
+    public void makeReceiptData() throws UnsupportedEncodingException {
+        Intent intent = getIntent();
+
+        mPayType = intent.getStringExtra("payType");
+        mResData = intent.getByteArrayExtra("resData");
+        mTotAmt = intent.getStringExtra("totAmt");
+        mVat = intent.getStringExtra("VAT");
+        mSupAmt = intent.getStringExtra("supplyAmt");
+        mPersonalNo = intent.getStringExtra("personalNo");
+        mTraderType = intent.getStringExtra("traderType");
+
+        trData = new TransactionData();
+        trData.SetData(mResData);
+
+        //StringBuffer cardNum = new StringBuffer();
+
+        // 카드 번호
+        cardNum = new String(trData.filler, "EUC-KR");
+
+        // 카드 명칭
+        cardCategory = new String(trData.cardCategoryName, "EUC-KR");
+
+        // 매입사명
+        purchaseCompany = new String(trData.purchaseCompanyName, "EUC-KR");
+
+        // 단말번호
+        deviceNumber = new String(trData.deviceNumber, "EUC-KR");
+
+        // 가맹번호
+        merchantNumber = new String(trData.merchantNumber, "EUC-KR");
+
+        // 승인번호
+        approvalNumber = new String(trData.approvalNumber, "EUC-KR");
+
+
+    }
 
 
 }

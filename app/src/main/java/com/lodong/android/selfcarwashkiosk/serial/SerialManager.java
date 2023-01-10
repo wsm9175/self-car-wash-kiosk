@@ -48,9 +48,11 @@ public class SerialManager implements SerialInputOutputManager.Listener {
     private byte[] newDate = new byte[6];
 
     private final byte[] SETTING_PRICE = {(byte) 0xF1, (byte) 0x0A, (byte) 0x00, (byte) 0x13, (byte) 0x00, (byte) 0xF2};
+//    private final byte[] SETTING_PRICE = {(byte) 0xF1, (byte) 0x0A, (byte) 0x00, (byte) 0x01, (byte) 0x00, (byte) 0xF2};
 
     //카드를 태그할때
     private final byte[] CARD_TAG = {(byte) 0xF1, (byte) 0x0B, (byte) 0x00, (byte) 0x13, (byte) 0x00, (byte) 0xF2};
+//    private final byte[] CARD_TAG = {(byte) 0xF1, (byte) 0x0B, (byte) 0x00, (byte) 0x01, (byte) 0x00, (byte) 0xF2};
 
     // 잔액부족시
     private final byte[] CARD_SHOTAGE = {(byte) 0xF1, (byte) 0x0D, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0xF2};
@@ -113,11 +115,11 @@ public class SerialManager implements SerialInputOutputManager.Listener {
         }
 
         //usb가 총 2개 연결 되므로 사이즈 체크
-        if (availableDrivers.size() < 2) {
+       /*if (availableDrivers.size() < 2) {
             Log.d(TAG, "availableDrivers.size() != 2");
             connectSerialListener.onFailed();
             return;
-        }
+        }*/
 
         UsbDeviceConnection connection = this.usbManager.openDevice(connectSerialDriver.getDevice());
 
@@ -125,9 +127,13 @@ public class SerialManager implements SerialInputOutputManager.Listener {
             return;
         }
         port = connectSerialDriver.getPorts().get(0);
+
+        Log.d(TAG, "connectSensor: 사이즈 확인" + connectSerialDriver.getPorts().size());
         try {
             Log.d(TAG, "connectSensor: try안에 진입" + connectSerialDriver.getDevice().getDeviceId());
             Log.d(TAG, "connectSensor: connection 확인" + connection);
+
+            Log.d(TAG, "connectSensor: 사이즈 확인" + connectSerialDriver.getPorts().size());
             port.open(connection);
             port.setParameters(19200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
             Log.d(TAG, "connectSensor: 포트 오픈" + UsbSerialPort.STOPBITS_1);

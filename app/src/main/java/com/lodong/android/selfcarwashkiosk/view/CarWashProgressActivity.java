@@ -18,6 +18,7 @@ public class CarWashProgressActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_car_wash_progress);
 
         BluetoothInterface.getInstance().settingWashConnectListener(getWashListener());
@@ -28,6 +29,7 @@ public class CarWashProgressActivity extends AppCompatActivity {
             e.printStackTrace();
             Toast.makeText(getApplicationContext(), "error : " + e, Toast.LENGTH_SHORT).show();
         }
+
         //집중모드
         Util.hideNavigationView(this);
     }

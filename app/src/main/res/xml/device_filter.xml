@@ -36,5 +36,5 @@
     <usb-device vendor-id="11914" product-id="10"  /> <!-- 0x2E8A / 0x000A: Raspberry Pi Pico SDK -->\
 
     <!-- 영수증 -->
-    <usb-device class="7" subclass="1"/>
+    <usb-device class="7" protocol="2" subclass="1"/>
 </resources>

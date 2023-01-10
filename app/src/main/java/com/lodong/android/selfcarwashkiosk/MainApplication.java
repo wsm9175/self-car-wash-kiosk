@@ -1,20 +1,13 @@
 package com.lodong.android.selfcarwashkiosk;
 
-import android.app.Activity;
 import android.app.Application;
 import android.os.Process;
 import android.system.ErrnoException;
-import android.system.Os;
 import android.util.Log;
-import android.widget.Toast;
-
-import androidx.core.app.ActivityCompat;
-
 import com.lodong.android.selfcarwashkiosk.Bluetooth.BluetoothInterface;
 import com.lodong.android.selfcarwashkiosk.callback.ConnectBluetoothListener;
 import com.lodong.android.selfcarwashkiosk.callback.ConnectSerialListener;
 import com.lodong.android.selfcarwashkiosk.serial.SerialManager;
-import com.lodong.android.selfcarwashkiosk.view.MainActivity;
 
 public class MainApplication extends Application {
     private static final String TAG = MainApplication.class.getSimpleName();
@@ -32,11 +25,12 @@ public class MainApplication extends Application {
     public void onCreate() {
         super.onCreate();
         mInstance = this;
-        /*try {
+
+        try {
             connectDevice();
         } catch (Throwable e) {
             e.printStackTrace();
-        }*/
+        }
     }
 
     public static MainApplication getInstance() {
@@ -54,6 +48,7 @@ public class MainApplication extends Application {
             serialManager.setConnectSerialListener(getConnectSerialListener());
             serialManager.settingSerial();
             serialManager.connectSensor();
+
             serialManager.rejectCard();
         }
     }
@@ -72,7 +67,9 @@ public class MainApplication extends Application {
             public void onSuccess() {
                 isSerialConnect = true;
                 reconnectSerialCount = 0;
+
                 connectBluetooth();
+
             }
 
             @Override
@@ -84,6 +81,9 @@ public class MainApplication extends Application {
                     Log.d(TAG, "reconnect try " + reconnectSerialCount);
                     //Toast.makeText(getApplicationContext(), "reconnect try " + reconnectSerialCount, Toast.LENGTH_SHORT).show();
                     settingSerial();
+
+
+
                 } else {
                     //Toast.makeText(getApplicationContext(), "Connect serial failed", Toast.LENGTH_SHORT).show();
                     Process.sendSignal(Process.myPid(), Process.SIGNAL_KILL);
@@ -111,6 +111,8 @@ public class MainApplication extends Application {
                     reconnectBluetoothCount++;
                     //Toast.makeText(getApplicationContext(), "reconnect try " + reconnectBluetoothCount, Toast.LENGTH_SHORT).show();
                     connectBluetooth();
+
+
                 } else {
                     //Toast.makeText(getApplicationContext(), "Connect bluetooth failed", Toast.LENGTH_SHORT).show();
                     Log.d(TAG, "not connect");
@@ -119,5 +121,7 @@ public class MainApplication extends Application {
             }
         };
     }
+
+
 
 }

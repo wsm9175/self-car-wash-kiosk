@@ -3,6 +3,7 @@ package com.lodong.android.selfcarwashkiosk.view;
 import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.helper.widget.MotionEffect;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -26,6 +27,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -79,6 +81,7 @@ public class ManagerDayActivity extends AppCompatActivity implements OnItemListe
         }
 
 
+
         dataList = database.mainDao().getPaymentInfo(d);
 
         setRoomData();
@@ -115,22 +118,32 @@ public class ManagerDayActivity extends AppCompatActivity implements OnItemListe
 
         dbvo.setDate(d);
 
-        SimpleDateFormat format1 = new SimpleDateFormat("HH:mm");
+        Log.d(TAG, "setRoomData: 데이트 확인하기" + d);
 
-        Date fDate = new Date();
+        LocalDateTime localDate = LocalDateTime.now();
+
+        String parseDate = localDate.format(DateTimeFormatter.ofPattern("HH:mm"));
+
+        Log.d(MotionEffect.TAG, "onCreate: parseDate" + parseDate);
+
+        DateFormat tFormat = new java.text.SimpleDateFormat("HH:mm");
+
+        Date time = new Date();
         try {
-            fDate = format1.parse(paymentTimeStr);
+            time = tFormat.parse(parseDate);
         } catch (ParseException e) {
             e.printStackTrace();
         }
 
-        dbvo.setTime(fDate);
+        Log.d(TAG, "setRoomData: 시간 확인" + time);
+
+        dbvo.setTime(time);
         // 2023년 01월 4일
         dbvo.setPaymentType(cardPay);
         dbvo.setWashType(normalWash);
         dbvo.setMoney(paymentMoney);
 
-        database.mainDao().insert(dbvo);
+        //database.mainDao().insert(dbvo);
         dataList.clear();
         dataList.addAll(database.mainDao().getPaymentInfo(d));
 
@@ -144,7 +157,7 @@ public class ManagerDayActivity extends AppCompatActivity implements OnItemListe
         // 날짜
         date = intent.getStringExtra("date");
 
-        Log.d(TAG, "getDate: date확인하기" + date);
+
 
         // 해당날짜의 마지막 일수
         maximumDate = Integer.parseInt(intent.getStringExtra("maximumDate"));
@@ -190,7 +203,35 @@ public class ManagerDayActivity extends AppCompatActivity implements OnItemListe
 
         String[] arr = date.replace("년", "").replace("월", "").replace("일", "").split(" ");
 
-        binding.dayRecycler.scrollToPosition(3+Integer.parseInt(arr[2]));
+        int move = 0;
+
+        Log.d(TAG, "setDateRecyclerView: 첫번째 요일 확인하기"+  firstWeekDay);
+
+        switch (firstWeekDay){
+            case "월요일":
+                move = 0;
+                break;
+            case"화요일":
+                move = 1;
+                break;
+            case "수요일":
+                move = 2;
+                break;
+            case "목요일":
+                move = 3;
+                break;
+            case "금요일":
+                move = 4;
+                break;
+            case "토요일":
+                move = 5;
+                break;
+            case "일요일":
+                move = 6;
+                break;
+        }
+
+        binding.dayRecycler.scrollToPosition(move+Integer.parseInt(arr[2]));
 
     }
 

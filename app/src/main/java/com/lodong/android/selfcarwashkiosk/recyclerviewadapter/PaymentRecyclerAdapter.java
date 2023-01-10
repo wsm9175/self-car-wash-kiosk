@@ -84,10 +84,20 @@ public class PaymentRecyclerAdapter extends RecyclerView.Adapter<PaymentRecycler
         // 이형태로 저장할것
         // 14:35
         Date paymentTimeStr = room.getTime();
+
+        Log.d(TAG, "onBindViewHolder: 시간 확인하기" + room.getTime());
+
         DateFormat sdFormat = new SimpleDateFormat("HH:mm");
+
+
         String time = sdFormat.format(paymentTimeStr);
 
-        holder.paymentTime.setText(time);
+        if(time == null || time == ""){
+            holder.paymentTime.setText("해당정보 없음");
+        }else {
+            holder.paymentTime.setText(time);
+        }
+
 
         // 3번째 숫자 마다 콤마 붙이기
         // 500,000

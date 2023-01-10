@@ -56,4 +56,8 @@ public class ChoiceModeActivity extends AppCompatActivity {
         startActivity(new Intent(this, ChoicePayModeActivity.class));
         timer.cancel();
     }
+
+
+
+
 }

@@ -32,7 +32,6 @@ public class RoomDBVO implements Serializable
     private String washType;
 
     // 세차기계
-    @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "washMachine")
     private int washMachine;
 
@@ -50,6 +49,7 @@ public class RoomDBVO implements Serializable
     private int unitPrice;
 
     // 결제날짜
+    @PrimaryKey()
     @ColumnInfo(name = "date")
     @TypeConverters({TimestampConverter.class})
     private Date date;
