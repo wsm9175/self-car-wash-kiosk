@@ -63,7 +63,6 @@ public class CardViewModel extends ViewModel {
                 // 불능 후 next intent
                 database = DBintialization.getInstance(mActivity.get(), "database");
 
-                saveRoomData();
                 
                 serialManager.rejectCard();
                 Log.d(TAG, "결제 성공");
@@ -85,7 +84,10 @@ public class CardViewModel extends ViewModel {
 //        mActivity.get().startActivity(new Intent(mActivity.get(), CarWashProgressActivity.class));
 //        mActivity.get().finish();
 
-        mActivity.get().startActivity(new Intent(mActivity.get(), CompletePayActivity.class));
+        Intent intent = new Intent(mActivity.get(), CompletePayActivity.class);
+        intent.putExtra("payType", "POINT");
+
+        mActivity.get().startActivity(intent);
 
     }
 
@@ -94,50 +96,5 @@ public class CardViewModel extends ViewModel {
         mActivity.get().finish();
     }
 
-    public void saveRoomData(){
 
-        String cardPay = "포인트승인";
-        String advancedWash = "고급세차";
-
-        int paymentMoney = 13_000;
-
-        LocalDateTime localDate = LocalDateTime.now();
-
-        String parseDate = localDate.format(DateTimeFormatter.ofPattern("HH:mm"));
-        String dateStr = localDate.format(DateTimeFormatter.ofPattern("yyyy MM dd"));
-
-        Log.d(MotionEffect.TAG, "onCreate: parseDate" + parseDate);
-
-        DateFormat tFormat = new java.text.SimpleDateFormat("HH:mm");
-        DateFormat dFormat = new java.text.SimpleDateFormat("yyyy MM dd");
-        Date date =  new Date();
-
-        try {
-            date = dFormat.parse(dateStr);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        Date time = new Date();
-        try {
-            time = tFormat.parse(parseDate);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        //------------------
-
-        RoomDBVO dbvo = new RoomDBVO();
-
-        dbvo.setPaymentType(cardPay);
-        dbvo.setWashType(advancedWash);
-        dbvo.setMoney(paymentMoney);
-        dbvo.setTime(time);
-        dbvo.setDate(date);
-        dbvo.setUnitPrice(13_000);
-
-        // 거래번호, 포인트 카드키
-        database.mainDao().insert(dbvo);
-
-    }
 }

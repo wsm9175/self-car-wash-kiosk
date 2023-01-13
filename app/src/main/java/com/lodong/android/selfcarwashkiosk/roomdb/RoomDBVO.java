@@ -14,6 +14,9 @@ import java.util.Date;
 public class RoomDBVO implements Serializable
 {
 
+    @PrimaryKey(autoGenerate = true)
+    private long id;
+
     // 거래번호
     @ColumnInfo(name = "transactionNumber")
     private String transactionNumber;
@@ -49,7 +52,6 @@ public class RoomDBVO implements Serializable
     private int unitPrice;
 
     // 결제날짜
-    @PrimaryKey()
     @ColumnInfo(name = "date")
     @TypeConverters({TimestampConverter.class})
     private Date date;
@@ -125,5 +127,13 @@ public class RoomDBVO implements Serializable
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 }

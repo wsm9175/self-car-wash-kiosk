@@ -50,7 +50,7 @@ public class MainApplication extends Application {
             serialManager.connectSensor();
 
             serialManager.rejectCard();
-        }
+            }
     }
 
     private void connectBluetooth() {
@@ -68,7 +68,7 @@ public class MainApplication extends Application {
                 isSerialConnect = true;
                 reconnectSerialCount = 0;
 
-                connectBluetooth();
+//                connectBluetooth();
 
             }
 

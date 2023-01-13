@@ -278,9 +278,6 @@ public class ManagerDayActivity extends AppCompatActivity implements OnItemListe
     @Override
     public void onItemClick(String dayText) {
 
-        //누르면 다시 paymentRecyclerView가 업데이트하도록 작성
-        Log.d(TAG, "onItemClick: 몇일?????????????????????????????????????" + dayText);
-
         String[] dateArr = date.replace("년", "").replace("월", "").replace("일", "").split(" ");
 
         String fixDate = dateArr[0] +" "+ dateArr[1] +" "+ dayText;

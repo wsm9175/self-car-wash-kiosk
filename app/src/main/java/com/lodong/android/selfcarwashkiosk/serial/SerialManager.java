@@ -47,12 +47,12 @@ public class SerialManager implements SerialInputOutputManager.Listener {
 
     private byte[] newDate = new byte[6];
 
-    private final byte[] SETTING_PRICE = {(byte) 0xF1, (byte) 0x0A, (byte) 0x00, (byte) 0x13, (byte) 0x00, (byte) 0xF2};
-//    private final byte[] SETTING_PRICE = {(byte) 0xF1, (byte) 0x0A, (byte) 0x00, (byte) 0x01, (byte) 0x00, (byte) 0xF2};
+//    private final byte[] SETTING_PRICE = {(byte) 0xF1, (byte) 0x0A, (byte) 0x00, (byte) 0x13, (byte) 0x00, (byte) 0xF2};
+    private final byte[] SETTING_PRICE = {(byte) 0xF1, (byte) 0x0A, (byte) 0x00, (byte) 0x90, (byte) 0x00, (byte) 0xF2};
 
     //카드를 태그할때
-    private final byte[] CARD_TAG = {(byte) 0xF1, (byte) 0x0B, (byte) 0x00, (byte) 0x13, (byte) 0x00, (byte) 0xF2};
-//    private final byte[] CARD_TAG = {(byte) 0xF1, (byte) 0x0B, (byte) 0x00, (byte) 0x01, (byte) 0x00, (byte) 0xF2};
+//    private final byte[] CARD_TAG = {(byte) 0xF1, (byte) 0x0B, (byte) 0x00, (byte) 0x13, (byte) 0x00, (byte) 0xF2};
+    private final byte[] CARD_TAG = {(byte) 0xF1, (byte) 0x0B, (byte) 0x00, (byte) 0x90, (byte) 0x00, (byte) 0xF2};
 
     // 잔액부족시
     private final byte[] CARD_SHOTAGE = {(byte) 0xF1, (byte) 0x0D, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0xF2};
@@ -108,7 +108,9 @@ public class SerialManager implements SerialInputOutputManager.Listener {
         UsbSerialDriver connectSerialDriver = null;
         for (UsbSerialDriver serialDriver : availableDrivers) {
             Log.d(TAG, serialDriver.getDevice().getDeviceName());
-            if (serialDriver.getDevice().getDeviceName().contains("/dev/bus/usb/001/")) {
+            
+            //-------------------------------------------------------------------------------------여기 경로 확인해서 바꾸기
+            if (serialDriver.getDevice().getDeviceName().contains("/dev/bus/usb/002/")) {
                 connectSerialDriver = serialDriver;
                 break;
             }
@@ -127,13 +129,13 @@ public class SerialManager implements SerialInputOutputManager.Listener {
             return;
         }
         port = connectSerialDriver.getPorts().get(0);
+        for (UsbSerialPort usbSerialPort:connectSerialDriver.getPorts()){
+            Log.d(TAG, "serial port : " + usbSerialPort.getDevice().getDeviceName());
+        }
 
-        Log.d(TAG, "connectSensor: 사이즈 확인" + connectSerialDriver.getPorts().size());
+
         try {
-            Log.d(TAG, "connectSensor: try안에 진입" + connectSerialDriver.getDevice().getDeviceId());
-            Log.d(TAG, "connectSensor: connection 확인" + connection);
 
-            Log.d(TAG, "connectSensor: 사이즈 확인" + connectSerialDriver.getPorts().size());
             port.open(connection);
             port.setParameters(19200, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE);
             Log.d(TAG, "connectSensor: 포트 오픈" + UsbSerialPort.STOPBITS_1);
@@ -160,7 +162,9 @@ public class SerialManager implements SerialInputOutputManager.Listener {
             port.write(SETTING_PRICE, 100);
             Log.d(TAG, "write");
         } catch (IOException e) {
+            Log.d(TAG, "settingPrice: 연결 안됨확인");
             connectSerialListener.onFailed();
+            Toast.makeText(context, "연결상태를 확인해주세요.", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
         }
     }

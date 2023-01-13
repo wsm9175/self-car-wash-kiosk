@@ -32,7 +32,8 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private MainViewModel viewModel;
 
-    Intent actionMain = new Intent(Intent.ACTION_MAIN);
+    Intent actionMain;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,8 +47,20 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "onCreate: 메인들어옴");
 
 
-        connectReapeat();
+    }
 
+    public void lockClear(){
+
+        byte[] RequestTelegram = makeSubFunc("S3");
+
+        ComponentName componentName = new ComponentName("com.ksnet.kscat_a","com.ksnet.kscat_a.PaymentIntentActivity");
+        actionMain = new Intent(Intent.ACTION_MAIN);
+        actionMain.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        actionMain.addCategory(Intent.CATEGORY_LAUNCHER);
+        actionMain.setComponent(componentName);
+        actionMain.putExtra("Telegram", RequestTelegram);
+        actionMain.putExtra("TelegramLength", RequestTelegram.length);
+        startActivityForResult(actionMain, 0);
     }
 
     @Override
@@ -69,8 +82,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void connectReapeat(){
-
-        Log.d(ContentValues.TAG, "connectReapeat: connectReapeat들어옴");
 
         byte[] RequestTelegram = makeSubFunc("UC");
         ComponentName componentName = new ComponentName("com.ksnet.kscat_a","com.ksnet.kscat_a.PaymentIntentActivity");
@@ -139,13 +150,10 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         
         if (resultCode == RESULT_OK ){
-
             Log.d(TAG, "onActivityResult: 괜찮음");
-            
-        }else{
 
+        }else{
             Log.d(TAG, "onActivityResult: 실패");
-            
         }
         
     }

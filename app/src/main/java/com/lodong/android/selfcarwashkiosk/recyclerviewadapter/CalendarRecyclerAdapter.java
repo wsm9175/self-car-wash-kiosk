@@ -115,9 +115,6 @@ public class CalendarRecyclerAdapter extends RecyclerView.Adapter<CalendarRecycl
             dayMoney = itemView.findViewById(R.id.daymoney);
         }
 
-        public void onBind(String display){
 
-
-        }
     }
 }

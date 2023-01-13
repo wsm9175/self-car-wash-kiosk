@@ -8,14 +8,12 @@ import static com.lodong.android.selfcarwashkiosk.outApp.Util.recreatePacketBySu
 
 import android.content.ComponentName;
 import android.content.ContentValues;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -25,23 +23,23 @@ import androidx.constraintlayout.helper.widget.MotionEffect;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.lodong.android.selfcarwashkiosk.R;
-import com.lodong.android.selfcarwashkiosk.roomdb.DBintialization;
-import com.lodong.android.selfcarwashkiosk.roomdb.RoomDBVO;
-import com.lodong.android.selfcarwashkiosk.view.CarWashProgressActivity;
 import com.lodong.android.selfcarwashkiosk.view.CompletePayActivity;
 import com.lodong.android.selfcarwashkiosk.view.MainActivity;
 import com.lodong.android.selfcarwashkiosk.viewmodel.CardViewModel;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 public class CardActivity extends AppCompatActivity {
+
+    private static final int EXTRA_PAY = 30001;
+    private static final int EXTRA_RECONNECT = 30000;
+
+
+
     private Intent mIntent;
     private byte[] mRequestTelegram;
     private String mDeviceNo = "AT0356011A";
@@ -55,7 +53,7 @@ public class CardActivity extends AppCompatActivity {
 
     int tempPayMethod = 1;
 
-    DBintialization database;
+
 
     Intent actionMain = new Intent(Intent.ACTION_MAIN);
 
@@ -67,9 +65,6 @@ public class CardActivity extends AppCompatActivity {
         viewModel = new ViewModelProvider(this, new ViewModelProvider.AndroidViewModelFactory(getApplication())).get(CardViewModel.class);
         viewModel.setParent(this);
 
-        database = DBintialization.getInstance(this, "database");
-
-        Log.d(TAG, "onCreate: 카드 액티비티 확인");
         //payMethod = 1 - 카드, payMethod = 2 - RFID 결제
         int payMethod = getIntent().getIntExtra("payMethod", 0);
 
@@ -77,8 +72,11 @@ public class CardActivity extends AppCompatActivity {
 
         //집중모드
         com.lodong.android.selfcarwashkiosk.util.Util.hideNavigationView(this);
-        if (payMethod == 1) {
-            cardPay();
+        if (payMethod == 1)
+        {
+            connectReapeat();
+//            cardPay();
+            //connectReapeat(); //재연결을 한다. 재연결을 성공시 카드 결제 시작
         } else if (payMethod == 2) {
             viewModel.settingSerial();
             try {
@@ -94,25 +92,7 @@ public class CardActivity extends AppCompatActivity {
         }
     }
 
-    void cardPay() {
-        // IC 승인
-        iv = findViewById(R.id.imageView);
 
-        connectReapeat();
-
-        Log.d("승인요청", "승인요청승인요청승인");
-        makeTelegramIC("1");
-        ComponentName componentName = new ComponentName("com.ksnet.kscat_a", "com.ksnet.kscat_a.PaymentIntentActivity");
-        mIntent = new Intent(Intent.ACTION_MAIN);
-        mIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        mIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-        mIntent.setComponent(componentName);
-        mIntent.putExtra("Telegram", mRequestTelegram);
-        mIntent.putExtra("TelegramLength", mRequestTelegram.length);
-        String str = Util.HexDump.dumpHexString(mRequestTelegram);
-        Log.d(TAG, "dumpHex : " + str);
-        startActivityForResult(mIntent, 0);
-    }
 
     private void makeTelegramIC(String ApprCode) {
         ByteBuffer bb = ByteBuffer.allocate(4096);
@@ -156,7 +136,7 @@ public class CardActivity extends AppCompatActivity {
 
         bb.put("00".getBytes());                         // 할부개월
 
-        String totAmt = "13000";
+        String totAmt = "100";
         Util.CalcTax tax = new Util.CalcTax();
         tax.setConfig(Long.parseLong(totAmt), 10, 0);
 
@@ -233,89 +213,156 @@ public class CardActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         Log.d(TAG, "onActivityResult");
 
-        trData = new TransactionData();
+//        trData = new TransactionData();
+////
+//        if (resultCode == RESULT_OK && data != null) {
 //
-        if (resultCode == RESULT_OK && data != null) {
+//            Log.d(TAG, "onActivityResult-1");
+//            Toast.makeText(this, "성공", Toast.LENGTH_LONG).show();
+//            byte[] recvByte = data.getByteArrayExtra("responseTelegram");
+//
+//
+//            Log.d(TAG, "결제 intent 수행");
+//            Intent intent = new Intent(CardActivity.this, ResultActivity.class);
+//            intent.putExtra("PayType", "CARD");
+//            intent.putExtra("resData", recvByte);
+//            intent.putExtra("totAmt", mTotAmt);
+//            intent.putExtra("VAT", mVat);
+//            intent.putExtra("supplyAmt", mSupAmt);
+////            startActivity(intent);
+//
+//            intentCarWashProgress("CARD", recvByte, mTotAmt);
+//        } else if (resultCode == RESULT_CANCELED) {
+//            if (data != null) {
+//                try {
+//
+//                    Log.d(TAG, "onActivityResult: try했을때");
+//                    Toast.makeText(getApplicationContext(), "카드리더기 연결 상태를 확인해주세요.", Toast.LENGTH_LONG).show();
+//                    cardCancel();
+//                    goToMain();
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//
+//                    Log.d(TAG, "onActivityResult: 장치 연결 실패");
+//                    Toast.makeText(getApplicationContext(), "카드리더기 연결 상태를 확인해주세요.", Toast.LENGTH_LONG).show();
+//
+//
+//                    goToMain();
+//                }
+//            } else {
+//                Toast.makeText(this, "앱 호출 실패", Toast.LENGTH_LONG).show();
+//                goToMain();
+//            }
+//        }
 
-            // 룸에 데이터 저장
-            saveRoomData();
+        //-------------------------------------------------------------------------------------------------------------
 
-            Log.d(TAG, "onActivityResult-1");
-            Toast.makeText(this, "성공", Toast.LENGTH_LONG).show();
+        trData = new TransactionData();
 
-            // 여기에서 영수증 출력함
-            //--------------------------------------------------------------------------------------------------------------------------------------------------
+        if ( requestCode == EXTRA_PAY ) {
+            //결제 요청
+            if (resultCode == RESULT_OK && data != null) {
+                //결제 요청인 경우
+                Log.d(TAG, "onActivityResult-1");
+                Toast.makeText(this, "성공", Toast.LENGTH_LONG).show();
 
-
-            byte[] recvByte = data.getByteArrayExtra("responseTelegram");
-            // Log.e("KSCAT_INTENT_RESULT", HexDump.dumpHexString(recvByte));
-            // Util.byteTo20ByteLog(recvByte, "");
-            Log.e("Recv Telegram \n", Util.HexDump.dumpHexString(recvByte));
-
-            String str = Util.HexDump.dumpHexString(recvByte);
-
-            // 승인번호 승인일자 가져오기
-            byte[] apprNo = new byte[12];
-            System.arraycopy(recvByte, 94, apprNo, 0, 12);
-            byte[] apprDate = new byte[6];
-            System.arraycopy(recvByte, 49, apprDate, 0, 6);
-
-            Log.d(TAG, "결제 intent 수행");
-            Intent intent = new Intent(CardActivity.this, ResultActivity.class);
-            intent.putExtra("PayType", "CARD");
-            intent.putExtra("resData", recvByte);
-            intent.putExtra("totAmt", mTotAmt);
-            intent.putExtra("VAT", mVat);
-            intent.putExtra("supplyAmt", mSupAmt);
-            //startActivity(intent);
-            intentCarWashProgress("CARD", recvByte, mTotAmt, mVat, mSupAmt);
-        } else if (resultCode == RESULT_CANCELED) {
-            if (data != null) {
-                Log.d(TAG, "onActivityResult-canceled");
-//                finish();
-                Log.e("result", String.valueOf(data.getIntExtra("result", 1)));
+                // 여기에서 영수증 출력함
+                //--------------------------------------------------------------------------------------------------------------------------------------------------
                 byte[] recvByte = data.getByteArrayExtra("responseTelegram");
-                Log.e("recvByte : \n", Util.HexDump.dumpHexString(recvByte));
-                trData.SetData(recvByte);
+                // Log.e("KSCAT_INTENT_RESULT", HexDump.dumpHexString(recvByte));
+                // Util.byteTo20ByteLog(recvByte, "");
+                Log.e("Recv Telegram \n", Util.HexDump.dumpHexString(recvByte));
 
+                String str = Util.HexDump.dumpHexString(recvByte);
+                Log.d(TAG, "결제 intent 수행");
+                Intent intent = new Intent(CardActivity.this, ResultActivity.class);
+                intent.putExtra("PayType", "CARD");
+                intent.putExtra("resData", recvByte);
+                intent.putExtra("totAmt", mTotAmt);
+                intent.putExtra("VAT", mVat);
+                intent.putExtra("supplyAmt", mSupAmt);
+                intentCarWashProgress("CARD", recvByte, mTotAmt);
+
+            }else{
+                //응답 에러인 경우
+                Log.e("결제 요청", "결제 요청에 실패했습니다.");
+                Toast.makeText(getApplicationContext(), "결제 요청에 실패했습니다. 관리자에게 문의해주세요", Toast.LENGTH_LONG).show();
+//                goToMain();
+                cardCancel();
+                restart();
+            }
+        } else if (requestCode == EXTRA_RECONNECT){
+            if (resultCode == RESULT_OK && data != null) {
+                //재연결에 성공한 경우 카드 결제를 요청한다.
                 try {
-                    String csMessage1 = new String(trData.message1, "EUC-KR");
-                    String csMessage2 = new String(trData.message2, "EUC-KR");
-                    String csNotice1 = new String(trData.notice1, "EUC-KR");
-                    String csNotice2 = new String(trData.notice2, "EUC-KR");
 
-                    String msg = csMessage1 + "\n" + csMessage2 + "\n" + csNotice1 + "\n" + csNotice2;
+                    cardPay();
 
-                    Log.d(TAG, "onActivityResult: mesege확인" + msg);
-
-                    // 지금 하면 이전거래 미완료
-
-
-                   /* new android.app.AlertDialog.Builder(this).setTitle("KSCAT_TEST").setMessage(msg).setCancelable(false).setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                        }
-                    }).show();*/
-                    String str = Util.HexDump.dumpHexString(recvByte);
-                    Toast.makeText(getApplicationContext(), "결제 실패했습니다.", Toast.LENGTH_LONG).show();
-                    connectReapeat();
-
-                    goToMain();
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Toast.makeText(getApplicationContext(), "결제 실패했습니다.", Toast.LENGTH_LONG).show();
-                    goToMain();
+                    //Toast.makeText(getApplicationContext(), "알수없는 에러가 났습니다.", Toast.LENGTH_LONG).show();
+//                    goToMain();
+                    cardCancel();
+                    restart();
                 }
-            } else {
-                Toast.makeText(this, "앱 호출 실패", Toast.LENGTH_LONG).show();
-                goToMain();
+            }else{
+                Log.e("재연결", "재연결 실패했습니다.");
+                Toast.makeText(getApplicationContext(), "연결에 실패했습니다. 관리자에게 문의해주세요", Toast.LENGTH_LONG).show();
+//                goToMain();
+                cardCancel();
+                restart();
             }
+        }else{
+            //요청하지 않은 결과값
+            Toast.makeText(getApplicationContext(), "서버연결에 실패했습니다.", Toast.LENGTH_LONG).show();
+//            goToMain();
+            cardCancel();
+            restart();
         }
+
+
     }
 
-    public void connectReapeat(){
+    private void cardCancel(){
+        ComponentName componentName = new ComponentName("com.ksnet.kscat_a","com.ksnet.kscat_a.PaymentIntentActivity");
+        mIntent = new Intent(Intent.ACTION_MAIN);
+        mIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        mIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        mIntent.setComponent(componentName);
+        mIntent.putExtra("Telegram", mRequestTelegram);
+        mIntent.putExtra("TelegramLength", mRequestTelegram.length);
+        startActivityForResult(mIntent, 0);
+    }
 
-        Log.d(ContentValues.TAG, "connectReapeat: connectReapeat들어옴");
+    public void restart(){
+        PackageManager packageManager = getPackageManager();
+        Intent intent = packageManager.getLaunchIntentForPackage(getPackageName());
+        ComponentName componentName = intent.getComponent();
+        Intent mainIntent = Intent.makeRestartActivityTask(componentName);
+        startActivity(mainIntent);
+        System.exit(0);
+    }
+
+    //카드요청
+    private void cardPay() {
+        // IC 승인
+        iv = findViewById(R.id.imageView);
+        Log.d("승인요청", "승인요청승인요청승인");
+        makeTelegramIC("1");
+        ComponentName componentName = new ComponentName("com.ksnet.kscat_a", "com.ksnet.kscat_a.PaymentIntentActivity");
+        mIntent = new Intent(Intent.ACTION_MAIN);
+        mIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        mIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        mIntent.setComponent(componentName);
+        mIntent.putExtra("Telegram", mRequestTelegram);
+        mIntent.putExtra("TelegramLength", mRequestTelegram.length);
+        String str = Util.HexDump.dumpHexString(mRequestTelegram);
+        Log.d(TAG, "dumpHex : " + str);
+        startActivityForResult(mIntent, EXTRA_PAY);
+    }
+
+    //재연결하기
+    public void connectReapeat(){
 
         byte[] RequestTelegram = makeSubFunc("UC");
         ComponentName componentName = new ComponentName("com.ksnet.kscat_a","com.ksnet.kscat_a.PaymentIntentActivity");
@@ -325,9 +372,7 @@ public class CardActivity extends AppCompatActivity {
         actionMain.setComponent(componentName);
         actionMain.putExtra("Telegram", RequestTelegram);
         actionMain.putExtra("TelegramLength", RequestTelegram.length);
-        startActivityForResult(actionMain, 0);
-
-        Log.d(MotionEffect.TAG, "connectReapeat: 연결됨");
+        startActivityForResult(actionMain, EXTRA_RECONNECT);
 
     }
 
@@ -380,58 +425,7 @@ public class CardActivity extends AppCompatActivity {
     }
 
 
-
-
-
-
-    public void saveRoomData(){
-
-        String cardPay = "카드승인";
-        String advancedWash = "고급세차";
-
-        int paymentMoney = 13_000;
-
-        LocalDateTime localDate = LocalDateTime.now();
-
-        String parseDate = localDate.format(DateTimeFormatter.ofPattern("HH:mm"));
-        String dateStr = localDate.format(DateTimeFormatter.ofPattern("yyyy MM dd"));
-
-        Log.d(MotionEffect.TAG, "onCreate: parseDate" + parseDate);
-
-        DateFormat tFormat = new java.text.SimpleDateFormat("HH:mm");
-        DateFormat dFormat = new java.text.SimpleDateFormat("yyyy MM dd");
-        Date date =  new Date();
-
-        try {
-            date = dFormat.parse(dateStr);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        Date time = new Date();
-        try {
-            time = tFormat.parse(parseDate);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        //------------------
-
-        RoomDBVO dbvo = new RoomDBVO();
-
-        dbvo.setPaymentType(cardPay);
-        dbvo.setWashType(advancedWash);
-        dbvo.setMoney(paymentMoney);
-        dbvo.setTime(time);
-        dbvo.setDate(date);
-        dbvo.setUnitPrice(13_000);
-
-        // 거래번호, 포인트 카드키
-        database.mainDao().insert(dbvo);
-
-    }
-
-    private void intentCarWashProgress(String payType, byte[] recvByte, String mTotAmt, String mVat, String mSupAmt) {
+    private void intentCarWashProgress(String payType, byte[] recvByte, String mTotAmt) {
         /*
         원래 이 코드임
         startActivity(new Intent(this, CarWashProgressActivity.class));
@@ -448,6 +442,11 @@ public class CardActivity extends AppCompatActivity {
         intent.putExtra("payType", payType);
         startActivity(intent);
 
+    }
+
+    private void intentError(){
+
+        finish();
     }
 
     private void goToMain(){

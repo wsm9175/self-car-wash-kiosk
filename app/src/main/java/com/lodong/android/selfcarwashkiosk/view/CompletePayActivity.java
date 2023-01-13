@@ -3,6 +3,7 @@ package com.lodong.android.selfcarwashkiosk.view;
 import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.helper.widget.MotionEffect;
 import androidx.databinding.DataBindingUtil;
 
 import android.Manifest;
@@ -21,12 +22,19 @@ import com.lodong.android.selfcarwashkiosk.Print.BixolonPrinter;
 import com.lodong.android.selfcarwashkiosk.R;
 import com.lodong.android.selfcarwashkiosk.databinding.ActivityCompletePayBinding;
 import com.lodong.android.selfcarwashkiosk.outApp.TransactionData;
+import com.lodong.android.selfcarwashkiosk.roomdb.DBintialization;
+import com.lodong.android.selfcarwashkiosk.roomdb.RoomDBVO;
 import com.lodong.android.selfcarwashkiosk.util.Util;
 
 import java.io.UnsupportedEncodingException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 public class CompletePayActivity extends AppCompatActivity {
     private ActivityCompletePayBinding binding;
@@ -68,6 +76,14 @@ public class CompletePayActivity extends AppCompatActivity {
     String approvalNumber;
 
 
+    DBintialization database;
+
+    Intent intent;
+    String total;
+    String deviceNo;
+    String date;
+    String payType;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,6 +91,8 @@ public class CompletePayActivity extends AppCompatActivity {
         binding.setActivity(this);
 
         bxlPrinter = new BixolonPrinter(getApplicationContext());
+
+        database = DBintialization.getInstance(this, "database");
 
         Thread.setDefaultUncaughtExceptionHandler(new AppUncaughtExceptionHandler());
 
@@ -85,6 +103,24 @@ public class CompletePayActivity extends AppCompatActivity {
                 }
             }
         }
+
+
+        intent = getIntent();
+        total = intent.getStringExtra("mTotAmt");
+        deviceNo = intent.getStringExtra("mDeviceNo");
+        date =  intent.getStringExtra("date");
+        payType = intent.getStringExtra("payType");
+
+        Log.d(TAG, "onCreate: payType확인" + payType);
+
+        if(payType.equals("CARD")){
+
+            saveCardRoomData();
+        }else{
+            savePointRoomData();
+        }
+
+        
         setBxlPrinter();
 
         //집중모드
@@ -115,19 +151,12 @@ public class CompletePayActivity extends AppCompatActivity {
 
     public void lastPrint() {
 
-        Intent intent = new Intent();
-        String total = intent.getStringExtra("mTotAmt");
-        String deviceNo = intent.getStringExtra("mDeviceNo");
-        String date=  intent.getStringExtra("date");
-        int payType = intent.getIntExtra("payType", 0);
-
-
         // 시간 가져오기 2023-01-06 12:50:11
 
 
         // 영수증 형식 20230106-01-0004
 
-        if(payType == 1){
+        if(payType.equals("CARD")){
             setCardPrint(total, deviceNo, date);
         }else{
             setPointPrint(total, deviceNo, date);
@@ -281,7 +310,7 @@ public class CompletePayActivity extends AppCompatActivity {
 
     public void intentNonPrint(){
         startActivity(new Intent(this, CarWashProgressActivity.class));
-        finish();
+        //finish();
     }
 
     public class AppUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
@@ -328,6 +357,108 @@ public class CompletePayActivity extends AppCompatActivity {
         // 승인번호
         approvalNumber = new String(trData.approvalNumber, "EUC-KR");
 
+
+    }
+
+    public void saveCardRoomData(){
+
+
+
+        String cardPay = "카드승인";
+        String advancedWash = "고급세차";
+
+        int paymentMoney = 13_000;
+
+        LocalDateTime localDate = LocalDateTime.now();
+
+//        String parseDate = localDate.format(DateTimeFormatter.ofPattern("HH:mm"));
+//        String dateStr = localDate.format(DateTimeFormatter.ofPattern("yyyy MM dd"));
+
+//        Log.d(MotionEffect.TAG, "onCreate: parseDate" + parseDate);
+//
+//        DateFormat tFormat = new java.text.SimpleDateFormat("HH:mm");
+//        DateFormat dFormat = new java.text.SimpleDateFormat("yyyy MM dd");
+//        Date date =  new Date();
+
+
+        SimpleDateFormat dFormat = new SimpleDateFormat("yyyy MM dd" , Locale.KOREA);
+
+
+        Date timeDate = new Date();
+        Date date = new Date();
+
+        try {
+            String formatString = dFormat.format(date);
+            date = dFormat.parse(formatString);
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+
+        Log.d(TAG, "saveCardRoomData: time" + timeDate);
+        Log.d(TAG, "saveCardRoomData: date" + date);
+
+        //------------------
+
+        RoomDBVO dbvo = new RoomDBVO();
+
+        dbvo.setPaymentType(cardPay);
+        dbvo.setWashType(advancedWash);
+        dbvo.setMoney(paymentMoney);
+        dbvo.setTime(timeDate);
+        dbvo.setDate(date);
+        dbvo.setUnitPrice(13_000);
+
+        // 거래번호, 포인트 카드키
+        database.mainDao().insert(dbvo);
+
+    }
+
+    public void savePointRoomData(){
+
+        String cardPay = "포인트승인";
+        String advancedWash = "고급세차";
+
+        int paymentMoney = 13_000;
+
+        LocalDateTime localDate = LocalDateTime.now();
+
+        String parseDate = localDate.format(DateTimeFormatter.ofPattern("HH:mm"));
+        String dateStr = localDate.format(DateTimeFormatter.ofPattern("yyyy MM dd"));
+
+        Log.d(MotionEffect.TAG, "onCreate: parseDate" + parseDate);
+
+        DateFormat tFormat = new java.text.SimpleDateFormat("HH:mm");
+        DateFormat dFormat = new java.text.SimpleDateFormat("yyyy MM dd");
+        Date date =  new Date();
+
+        try {
+            date = dFormat.parse(dateStr);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        Date time = new Date();
+        try {
+            time = tFormat.parse(parseDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        //------------------
+
+        RoomDBVO dbvo = new RoomDBVO();
+
+        dbvo.setPaymentType(cardPay);
+        dbvo.setWashType(advancedWash);
+        dbvo.setMoney(paymentMoney);
+        dbvo.setTime(time);
+        dbvo.setDate(date);
+        dbvo.setUnitPrice(13_000);
+
+        // 거래번호, 포인트 카드키
+        database.mainDao().insert(dbvo);
 
     }
 

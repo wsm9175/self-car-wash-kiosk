@@ -21,14 +21,14 @@ public class CarWashProgressActivity extends AppCompatActivity {
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_car_wash_progress);
 
-        BluetoothInterface.getInstance().settingWashConnectListener(getWashListener());
+//        BluetoothInterface.getInstance().settingWashConnectListener(getWashListener());
 
-        try {
-            startWash();
-        } catch (Throwable e) {
-            e.printStackTrace();
-            Toast.makeText(getApplicationContext(), "error : " + e, Toast.LENGTH_SHORT).show();
-        }
+//        try {
+//            startWash();
+//        } catch (Throwable e) {
+//            e.printStackTrace();
+//            Toast.makeText(getApplicationContext(), "error : " + e, Toast.LENGTH_SHORT).show();
+//        }
 
         //집중모드
         Util.hideNavigationView(this);
