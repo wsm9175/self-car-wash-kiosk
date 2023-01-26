@@ -13,6 +13,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 
 import com.lodong.android.selfcarwashkiosk.R;
@@ -91,20 +92,17 @@ public class ManagerDayActivity extends AppCompatActivity implements OnItemListe
 
         setPaymentRecyclerView();
 
+        binding.preBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), ManagerMonth.class));
+            }
+        });
+
     }
 
     public void setRoomData(){
 
-        String cardPay = "카드승인";
-        String pointPay = "포인트승인";
-
-        String normalWash = "일반세차";
-        String advancedWash = "고급세차";
-        String paymentTimeStr = "12:35";
-
-        int paymentMoney = 200_00;
-
-        RoomDBVO dbvo = new RoomDBVO();
 
         DateFormat format = new SimpleDateFormat("yyyy MM dd");
 
@@ -116,34 +114,6 @@ public class ManagerDayActivity extends AppCompatActivity implements OnItemListe
             e.printStackTrace();
         }
 
-        dbvo.setDate(d);
-
-        Log.d(TAG, "setRoomData: 데이트 확인하기" + d);
-
-        LocalDateTime localDate = LocalDateTime.now();
-
-        String parseDate = localDate.format(DateTimeFormatter.ofPattern("HH:mm"));
-
-        Log.d(MotionEffect.TAG, "onCreate: parseDate" + parseDate);
-
-        DateFormat tFormat = new java.text.SimpleDateFormat("HH:mm");
-
-        Date time = new Date();
-        try {
-            time = tFormat.parse(parseDate);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        Log.d(TAG, "setRoomData: 시간 확인" + time);
-
-        dbvo.setTime(time);
-        // 2023년 01월 4일
-        dbvo.setPaymentType(cardPay);
-        dbvo.setWashType(normalWash);
-        dbvo.setMoney(paymentMoney);
-
-        //database.mainDao().insert(dbvo);
         dataList.clear();
         dataList.addAll(database.mainDao().getPaymentInfo(d));
 

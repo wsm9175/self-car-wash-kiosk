@@ -46,7 +46,6 @@ public class MainActivity extends AppCompatActivity {
 
         Log.d(TAG, "onCreate: 메인들어옴");
 
-
     }
 
     public void lockClear(){
@@ -68,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         //집중모드
         Util.hideNavigationView(this);
+        MainApplication.getInstance().serialManager.rejectCard();
         //Lock모드
         //Util.startLock(this);
     }
@@ -157,4 +157,5 @@ public class MainActivity extends AppCompatActivity {
         }
         
     }
+
 }

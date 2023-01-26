@@ -2,9 +2,11 @@ package com.lodong.android.selfcarwashkiosk.serial;
 
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
@@ -47,12 +49,12 @@ public class SerialManager implements SerialInputOutputManager.Listener {
 
     private byte[] newDate = new byte[6];
 
-//    private final byte[] SETTING_PRICE = {(byte) 0xF1, (byte) 0x0A, (byte) 0x00, (byte) 0x13, (byte) 0x00, (byte) 0xF2};
-    private final byte[] SETTING_PRICE = {(byte) 0xF1, (byte) 0x0A, (byte) 0x00, (byte) 0x90, (byte) 0x00, (byte) 0xF2};
+    private final byte[] SETTING_PRICE = {(byte) 0xF1, (byte) 0x0A, (byte) 0x00, (byte) 0x13, (byte) 0x00, (byte) 0xF2};
+    //private final byte[] SETTING_PRICE = {(byte) 0xF1, (byte) 0x0A, (byte) 0x00, (byte) 0x00, (byte) 0x10, (byte) 0xF2};
 
     //카드를 태그할때
-//    private final byte[] CARD_TAG = {(byte) 0xF1, (byte) 0x0B, (byte) 0x00, (byte) 0x13, (byte) 0x00, (byte) 0xF2};
-    private final byte[] CARD_TAG = {(byte) 0xF1, (byte) 0x0B, (byte) 0x00, (byte) 0x90, (byte) 0x00, (byte) 0xF2};
+    private final byte[] CARD_TAG = {(byte) 0xF1, (byte) 0x0B, (byte) 0x00, (byte) 0x13, (byte) 0x00, (byte) 0xF2};
+//    private final byte[] CARD_TAG = {(byte) 0xF1, (byte) 0x0B, (byte) 0x00, (byte) 0x00, (byte) 0x10, (byte) 0xF2};
 
     // 잔액부족시
     private final byte[] CARD_SHOTAGE = {(byte) 0xF1, (byte) 0x0D, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0xF2};
@@ -110,7 +112,11 @@ public class SerialManager implements SerialInputOutputManager.Listener {
             Log.d(TAG, serialDriver.getDevice().getDeviceName());
             
             //-------------------------------------------------------------------------------------여기 경로 확인해서 바꾸기
-            if (serialDriver.getDevice().getDeviceName().contains("/dev/bus/usb/002/")) {
+         /*   if (serialDriver.getDevice().getDeviceName().contains("/dev/bus/usb/002/")) { //1번
+                connectSerialDriver = serialDriver;
+                break;
+            }*/
+            if (serialDriver.getDevice().getDeviceName().contains("/dev/bus/usb/001/")) { //2번
                 connectSerialDriver = serialDriver;
                 break;
             }
@@ -141,6 +147,7 @@ public class SerialManager implements SerialInputOutputManager.Listener {
             Log.d(TAG, "connectSensor: 포트 오픈" + UsbSerialPort.STOPBITS_1);
         } catch (IOException e) {
             connectSerialListener.onFailed();
+            restart();
             e.printStackTrace();
         }
 
@@ -152,6 +159,7 @@ public class SerialManager implements SerialInputOutputManager.Listener {
             e.printStackTrace();
             connectSerialListener.onFailed();
             Toast.makeText(context, "연결상태를 다시 확인해주세요.", Toast.LENGTH_SHORT).show();
+            restart();
             return;
         }
         Log.d(TAG, "usb start");
@@ -165,6 +173,7 @@ public class SerialManager implements SerialInputOutputManager.Listener {
             Log.d(TAG, "settingPrice: 연결 안됨확인");
             connectSerialListener.onFailed();
             Toast.makeText(context, "연결상태를 확인해주세요.", Toast.LENGTH_SHORT).show();
+            restart();
             e.printStackTrace();
         }
     }
@@ -175,6 +184,8 @@ public class SerialManager implements SerialInputOutputManager.Listener {
             Log.d(TAG, "RejectCard: 태그 거부하겠다.");
             port.write(CARD_REJECT_TAG, 100);
         } catch (IOException e) {
+
+            restart();
             e.printStackTrace();
         }
     }
@@ -220,5 +231,14 @@ public class SerialManager implements SerialInputOutputManager.Listener {
 
     public void setRfidPayListener(RfidPayListener rfidPayListener) {
         this.rfidPayListener = rfidPayListener;
+    }
+
+    public void restart(){
+        PackageManager packageManager = context.getPackageManager();
+        Intent intent = packageManager.getLaunchIntentForPackage(context.getPackageName());
+        ComponentName componentName = intent.getComponent();
+        Intent mainIntent = Intent.makeRestartActivityTask(componentName);
+        context.startActivity(mainIntent);
+        System.exit(0);
     }
 }

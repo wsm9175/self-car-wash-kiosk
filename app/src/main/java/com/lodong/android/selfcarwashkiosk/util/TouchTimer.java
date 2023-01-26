@@ -13,7 +13,7 @@ import java.util.TimerTask;
 
 public class TouchTimer extends TimerTask {
     private Activity activity;
-    private final int LIMIT_TIME = 90;
+    private final int LIMIT_TIME = 45;
     private int time = 0;
 
     private TouchHandler touchHandler;

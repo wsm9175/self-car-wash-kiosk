@@ -3,7 +3,9 @@ package com.lodong.android.selfcarwashkiosk.viewmodel;
 import static android.content.ContentValues.TAG;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.util.Log;
 import android.util.Printer;
 import android.widget.Toast;
@@ -39,8 +41,6 @@ public class CardViewModel extends ViewModel {
         this.mActivity = new WeakReference<>(parent);
     }
 
-    DBintialization database;
-
     public void settingSerial(){
         Log.d("settingSerial", "settingSerial: 세팅 시리얼");
         serialManager = SerialManager.getInstance(mActivity.get());
@@ -50,6 +50,7 @@ public class CardViewModel extends ViewModel {
         Log.d(TAG, "connectSensor: 커넥트 센서");
         serialManager.settingPrice();
     }
+
     public void RejectCard(){
         Log.d("태그거부상태 카드", "RejectCard: rejectCard");
         serialManager.rejectCard();
@@ -61,9 +62,7 @@ public class CardViewModel extends ViewModel {
             public void onSuccess() {
 
                 // 불능 후 next intent
-                database = DBintialization.getInstance(mActivity.get(), "database");
 
-                
                 serialManager.rejectCard();
                 Log.d(TAG, "결제 성공");
                 intentCarWashProgress();
@@ -75,8 +74,9 @@ public class CardViewModel extends ViewModel {
                 serialManager.rejectCard();
                 mActivity.get().runOnUiThread(() -> Toast.makeText(mActivity.get(), "잔액이 부족합니다.", Toast.LENGTH_LONG).show());
                 Log.d(TAG, "실패");
-                goToMain();
+                restart();
             }
+
         };
     }
 
@@ -84,17 +84,27 @@ public class CardViewModel extends ViewModel {
 //        mActivity.get().startActivity(new Intent(mActivity.get(), CarWashProgressActivity.class));
 //        mActivity.get().finish();
 
-        Intent intent = new Intent(mActivity.get(), CompletePayActivity.class);
+        Intent intent = new Intent(mActivity.get(), CarWashProgressActivity.class);
         intent.putExtra("payType", "POINT");
 
         mActivity.get().startActivity(intent);
-
+        mActivity.get().finish();
     }
 
     private void goToMain(){
         mActivity.get().startActivity(new Intent( mActivity.get(), MainActivity.class));
         mActivity.get().finish();
     }
+    public void restart(){
+        PackageManager packageManager = mActivity.get().getPackageManager();
+        Intent intent = packageManager.getLaunchIntentForPackage(mActivity.get().getPackageName());
+        ComponentName componentName = intent.getComponent();
+        Intent mainIntent = Intent.makeRestartActivityTask(componentName);
+        mActivity.get().startActivity(mainIntent);
+        System.exit(0);
+    }
+
+
 
 
 }

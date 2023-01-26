@@ -1,6 +1,5 @@
 package com.lodong.android.selfcarwashkiosk.Bluetooth;
 
-
 import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 
 import android.annotation.SuppressLint;
@@ -18,8 +17,6 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.UUID;
 
-
-
 public class BluetoothInterface {
     private static BluetoothInterface instance;
     private boolean isConnect = false;
@@ -27,8 +24,11 @@ public class BluetoothInterface {
     private BluetoothDevice device;
     private BluetoothAdapter btAdapter;
     private BluetoothSocket btSocket;
-    //private final String HC06_ADDRESS = "E0:5A:1B:5F:8E:1E";
-    private final String HC06_ADDRESS = "E0:5A:1B:60:58:9E";
+
+    //-----------------------------------------------------여기 주소 바꾸기---------------------
+    //private final String HC06_ADDRESS = "E0:5A:1B:5F:8E:1E"; //1번
+    private final String HC06_ADDRESS = "E0:5A:1B:60:58:9E"; // 2번
+
     UUID BT_MODULE_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private ConnectBluetoothListener connectListener;
 

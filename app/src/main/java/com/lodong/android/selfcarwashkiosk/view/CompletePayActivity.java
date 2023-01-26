@@ -76,7 +76,7 @@ public class CompletePayActivity extends AppCompatActivity {
     String approvalNumber;
 
 
-    DBintialization database;
+
 
     Intent intent;
     String total;
@@ -92,7 +92,7 @@ public class CompletePayActivity extends AppCompatActivity {
 
         bxlPrinter = new BixolonPrinter(getApplicationContext());
 
-        database = DBintialization.getInstance(this, "database");
+
 
         Thread.setDefaultUncaughtExceptionHandler(new AppUncaughtExceptionHandler());
 
@@ -109,24 +109,13 @@ public class CompletePayActivity extends AppCompatActivity {
         total = intent.getStringExtra("mTotAmt");
         deviceNo = intent.getStringExtra("mDeviceNo");
         date =  intent.getStringExtra("date");
-        payType = intent.getStringExtra("payType");
 
-        Log.d(TAG, "onCreate: payType확인" + payType);
-
-        if(payType.equals("CARD")){
-
-            saveCardRoomData();
-        }else{
-            savePointRoomData();
-        }
 
         
         setBxlPrinter();
 
         //집중모드
         Util.hideNavigationView(this);
-
-
 
     }
 
@@ -152,7 +141,6 @@ public class CompletePayActivity extends AppCompatActivity {
     public void lastPrint() {
 
         // 시간 가져오기 2023-01-06 12:50:11
-
 
         // 영수증 형식 20230106-01-0004
 
@@ -193,11 +181,10 @@ public class CompletePayActivity extends AppCompatActivity {
         String dateStr = getDate();
         String receiptDate = getReceiptDate(dateStr);
 
-        strData = "\n[매장명]  워시큐브  목포센터/537-87-01157\n" +
+        strData = "\n[매장명]  워시큐브  목포남악센터/566-88-01680\n" +
                 "[주소]    전남  목포시 영산로 792\n" +
-                "[대표자]  이름   [TEL] 061-282-3782\n" +
+                "[대표자]   최종규  [TEL] 061-282-3782\n" +
                 "[매출일]  " + dateStr +"\n"+
-                "[영수증]  " + receiptDate + " \n" +
                 "==============================================\n" +
                 "   상 품 명       단 가     수 량       금 액\n" +
                 "----------------------------------------------\n" +
@@ -258,11 +245,10 @@ public class CompletePayActivity extends AppCompatActivity {
         String dateStr = getDate();
         String receiptDate = getReceiptDate(dateStr);
 
-        strData = "\n[매장명]  워시큐브  목포센터\n" +
+        strData = "\n[매장명]  워시큐브  목포남악센터/566-88-01680\n" +
                 "[주소]    전남  목포시 영산로 792\n" +
-                "[대표자]  이름   [TEL] 061-282-3782\n" +
+                "[대표자]  최종규   [TEL] 061-282-3782\n" +
                 "[매출일]  " + dateStr +"\n"+
-                "[영수증]  " + receiptDate + " \n" +
                 "==============================================\n" +
                 "   상 품 명       단 가     수 량       금 액\n" +
                 "----------------------------------------------\n" +
@@ -360,107 +346,7 @@ public class CompletePayActivity extends AppCompatActivity {
 
     }
 
-    public void saveCardRoomData(){
 
-
-
-        String cardPay = "카드승인";
-        String advancedWash = "고급세차";
-
-        int paymentMoney = 13_000;
-
-        LocalDateTime localDate = LocalDateTime.now();
-
-//        String parseDate = localDate.format(DateTimeFormatter.ofPattern("HH:mm"));
-//        String dateStr = localDate.format(DateTimeFormatter.ofPattern("yyyy MM dd"));
-
-//        Log.d(MotionEffect.TAG, "onCreate: parseDate" + parseDate);
-//
-//        DateFormat tFormat = new java.text.SimpleDateFormat("HH:mm");
-//        DateFormat dFormat = new java.text.SimpleDateFormat("yyyy MM dd");
-//        Date date =  new Date();
-
-
-        SimpleDateFormat dFormat = new SimpleDateFormat("yyyy MM dd" , Locale.KOREA);
-
-
-        Date timeDate = new Date();
-        Date date = new Date();
-
-        try {
-            String formatString = dFormat.format(date);
-            date = dFormat.parse(formatString);
-
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-
-        Log.d(TAG, "saveCardRoomData: time" + timeDate);
-        Log.d(TAG, "saveCardRoomData: date" + date);
-
-        //------------------
-
-        RoomDBVO dbvo = new RoomDBVO();
-
-        dbvo.setPaymentType(cardPay);
-        dbvo.setWashType(advancedWash);
-        dbvo.setMoney(paymentMoney);
-        dbvo.setTime(timeDate);
-        dbvo.setDate(date);
-        dbvo.setUnitPrice(13_000);
-
-        // 거래번호, 포인트 카드키
-        database.mainDao().insert(dbvo);
-
-    }
-
-    public void savePointRoomData(){
-
-        String cardPay = "포인트승인";
-        String advancedWash = "고급세차";
-
-        int paymentMoney = 13_000;
-
-        LocalDateTime localDate = LocalDateTime.now();
-
-        String parseDate = localDate.format(DateTimeFormatter.ofPattern("HH:mm"));
-        String dateStr = localDate.format(DateTimeFormatter.ofPattern("yyyy MM dd"));
-
-        Log.d(MotionEffect.TAG, "onCreate: parseDate" + parseDate);
-
-        DateFormat tFormat = new java.text.SimpleDateFormat("HH:mm");
-        DateFormat dFormat = new java.text.SimpleDateFormat("yyyy MM dd");
-        Date date =  new Date();
-
-        try {
-            date = dFormat.parse(dateStr);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        Date time = new Date();
-        try {
-            time = tFormat.parse(parseDate);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        //------------------
-
-        RoomDBVO dbvo = new RoomDBVO();
-
-        dbvo.setPaymentType(cardPay);
-        dbvo.setWashType(advancedWash);
-        dbvo.setMoney(paymentMoney);
-        dbvo.setTime(time);
-        dbvo.setDate(date);
-        dbvo.setUnitPrice(13_000);
-
-        // 거래번호, 포인트 카드키
-        database.mainDao().insert(dbvo);
-
-    }
 
 
 }

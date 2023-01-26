@@ -1,6 +1,9 @@
 package com.lodong.android.selfcarwashkiosk;
 
 import android.app.Application;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Process;
 import android.system.ErrnoException;
 import android.util.Log;
@@ -13,7 +16,7 @@ public class MainApplication extends Application {
     private static final String TAG = MainApplication.class.getSimpleName();
     private static MainApplication mInstance;
     private BluetoothInterface bluetoothInterface;
-    private SerialManager serialManager;
+    public SerialManager serialManager;
 
     private int reconnectSerialCount = 0;
     private int reconnectBluetoothCount = 0;
@@ -68,7 +71,7 @@ public class MainApplication extends Application {
                 isSerialConnect = true;
                 reconnectSerialCount = 0;
 
-//                connectBluetooth();
+                connectBluetooth();
 
             }
 
@@ -82,11 +85,10 @@ public class MainApplication extends Application {
                     //Toast.makeText(getApplicationContext(), "reconnect try " + reconnectSerialCount, Toast.LENGTH_SHORT).show();
                     settingSerial();
 
-
-
                 } else {
+                    restart();
                     //Toast.makeText(getApplicationContext(), "Connect serial failed", Toast.LENGTH_SHORT).show();
-                    Process.sendSignal(Process.myPid(), Process.SIGNAL_KILL);
+                    //Process.sendSignal(Process.myPid(), Process.SIGNAL_KILL);
                 }
             }
         };
@@ -116,12 +118,17 @@ public class MainApplication extends Application {
                 } else {
                     //Toast.makeText(getApplicationContext(), "Connect bluetooth failed", Toast.LENGTH_SHORT).show();
                     Log.d(TAG, "not connect");
-                    Process.sendSignal(Process.myPid(), Process.SIGNAL_KILL);
+                    //Process.sendSignal(Process.myPid(), Process.SIGNAL_KILL);
                 }
             }
         };
     }
-
-
-
+    public void restart(){
+        PackageManager packageManager = getPackageManager();
+        Intent intent = packageManager.getLaunchIntentForPackage(getPackageName());
+        ComponentName componentName = intent.getComponent();
+        Intent mainIntent = Intent.makeRestartActivityTask(componentName);
+        startActivity(mainIntent);
+        System.exit(0);
+    }
 }
