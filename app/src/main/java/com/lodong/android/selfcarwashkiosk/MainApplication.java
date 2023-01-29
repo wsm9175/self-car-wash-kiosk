@@ -41,10 +41,11 @@ public class MainApplication extends Application {
     }
 
     public void connectDevice() throws ErrnoException {
+        connectBluetooth();
         settingSerial();
     }
 
-    private void settingSerial() throws ErrnoException {
+    public void settingSerial() throws ErrnoException {
         Log.d(TAG, "settingSerial: 세팅 시리얼");
         if(!isSerialConnect){
             serialManager = SerialManager.getInstance(getApplicationContext());
@@ -56,7 +57,8 @@ public class MainApplication extends Application {
             }
     }
 
-    private void connectBluetooth() {
+    public void connectBluetooth() {
+        Log.d(TAG, "connectBluetooth");
         if(!isBluetoothConnect){
             bluetoothInterface = BluetoothInterface.getInstance();
             bluetoothInterface.setConnectListener(getConnectListener());
@@ -70,21 +72,17 @@ public class MainApplication extends Application {
             public void onSuccess() {
                 isSerialConnect = true;
                 reconnectSerialCount = 0;
-
-                connectBluetooth();
-
             }
 
             @Override
             public void onFailed() throws ErrnoException {
                 Log.d(TAG, "onFailed : connect serial failed");
-                if (reconnectSerialCount <= 3) {
+                if (reconnectSerialCount <= 5) {
                     isSerialConnect = false;
                     reconnectSerialCount++;
                     Log.d(TAG, "reconnect try " + reconnectSerialCount);
                     //Toast.makeText(getApplicationContext(), "reconnect try " + reconnectSerialCount, Toast.LENGTH_SHORT).show();
                     settingSerial();
-
                 } else {
                     restart();
                     //Toast.makeText(getApplicationContext(), "Connect serial failed", Toast.LENGTH_SHORT).show();
@@ -100,25 +98,27 @@ public class MainApplication extends Application {
             public void onSuccess() {
                 Log.d(TAG, "connect success");
                 isBluetoothConnect = true;
+                BluetoothInterface.getInstance().setReconnect(false);
                 reconnectBluetoothCount = 0;
             }
 
             @Override
             public void onFailed()  {
                 Log.d(TAG, "onFailed: connect bluetooth failed");
-                //Toast.makeText(getApplicationContext(), "Connect bluetooth module failed", Toast.LENGTH_SHORT).show();
-                if (reconnectBluetoothCount <= 3) {
+                if(reconnectBluetoothCount <= 25){
                     Log.d(TAG, "reconnect try " + reconnectBluetoothCount);
                     isBluetoothConnect = false;
+                    BluetoothInterface.getInstance().setConnect(false);
+                    BluetoothInterface.getInstance().setConnectedThread(null);
+                    //BluetoothInterface.getInstance().setReconnect(true);
                     reconnectBluetoothCount++;
                     //Toast.makeText(getApplicationContext(), "reconnect try " + reconnectBluetoothCount, Toast.LENGTH_SHORT).show();
                     connectBluetooth();
-
-
-                } else {
                     //Toast.makeText(getApplicationContext(), "Connect bluetooth failed", Toast.LENGTH_SHORT).show();
                     Log.d(TAG, "not connect");
                     //Process.sendSignal(Process.myPid(), Process.SIGNAL_KILL);
+                }else{
+                    //restart();
                 }
             }
         };
@@ -130,5 +130,9 @@ public class MainApplication extends Application {
         Intent mainIntent = Intent.makeRestartActivityTask(componentName);
         startActivity(mainIntent);
         System.exit(0);
+    }
+
+    public boolean isBluetoothConnect() {
+        return isBluetoothConnect;
     }
 }

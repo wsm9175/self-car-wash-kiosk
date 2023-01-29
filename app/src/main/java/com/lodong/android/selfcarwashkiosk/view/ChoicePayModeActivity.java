@@ -27,8 +27,6 @@ public class ChoicePayModeActivity extends AppCompatActivity {
     private TouchTimer touchTimer;
     private Timer timer;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,8 +36,6 @@ public class ChoicePayModeActivity extends AppCompatActivity {
         settingClickListener();
         //집중모드
         Util.hideNavigationView(this);
-
-
     }
 
     private void settingClickListener(){
@@ -70,6 +66,7 @@ public class ChoicePayModeActivity extends AppCompatActivity {
         intent.putExtra("payMethod",1);
         startActivity(intent);
         timer.cancel();
+        finish();
     }
 
     public void intentRFIDPay(){
@@ -77,9 +74,10 @@ public class ChoicePayModeActivity extends AppCompatActivity {
         intent.putExtra("payMethod",2);
         startActivity(intent);
         timer.cancel();
+        finish();
     }
-
-
-
-
+    public void goToMain(){
+        timer.cancel();
+        finish();
+    }
 }

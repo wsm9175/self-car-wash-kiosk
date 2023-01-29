@@ -13,13 +13,16 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.lodong.android.selfcarwashkiosk.R;
+import com.lodong.android.selfcarwashkiosk.databinding.ActivityCardBinding;
 import com.lodong.android.selfcarwashkiosk.view.CarWashProgressActivity;
 import com.lodong.android.selfcarwashkiosk.view.CompletePayActivity;
 import com.lodong.android.selfcarwashkiosk.view.MainActivity;
@@ -41,6 +44,7 @@ public class CardActivity extends AppCompatActivity {
     private ImageView iv;
 
     private CardViewModel viewModel;
+    private LinearLayout layout;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -51,6 +55,9 @@ public class CardActivity extends AppCompatActivity {
         viewModel.setParent(this);
 
         Log.d(TAG, "onCreate: 카드 액티비티 확인");
+
+        layout = findViewById(R.id.btn_go_to_home);
+        layout.setOnClickListener(v -> goToMain());
         //payMethod = 1 - 카드, payMethod = 2 - RFID 결제
         int payMethod = getIntent().getIntExtra("payMethod", 0);
         //집중모드
@@ -289,5 +296,6 @@ public class CardActivity extends AppCompatActivity {
         startActivity(mainIntent);
         System.exit(0);
     }
+
 }
  

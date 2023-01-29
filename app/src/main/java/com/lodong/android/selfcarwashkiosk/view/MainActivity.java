@@ -141,10 +141,8 @@ public class MainActivity extends AppCompatActivity {
             packet = insertBytes(packet, packet.length, "                    ".getBytes());         // (9) 여유필드
             packet = recreatePacketBySubFuncFormat(packet);
         }
-
         return packet;
     }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

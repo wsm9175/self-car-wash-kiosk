@@ -6,15 +6,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.helper.widget.MotionEffect;
 import androidx.databinding.DataBindingUtil;
 
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lodong.android.selfcarwashkiosk.Bluetooth.BluetoothInterface;
+import com.lodong.android.selfcarwashkiosk.MainApplication;
 import com.lodong.android.selfcarwashkiosk.R;
 import com.lodong.android.selfcarwashkiosk.callback.WashListener;
 import com.lodong.android.selfcarwashkiosk.databinding.ActivityCarWashProgressBinding;
@@ -29,8 +29,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class CarWashProgressActivity extends AppCompatActivity {
     private ActivityCarWashProgressBinding binding;
@@ -41,16 +39,14 @@ public class CarWashProgressActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         binding = DataBindingUtil.setContentView(this, R.layout.activity_car_wash_progress);
-
         database = DBintialization.getInstance(this, "database");
         BluetoothInterface.getInstance().settingWashConnectListener(getWashListener());
-      /*  new Handler().postDelayed(() -> {
+        new Handler().postDelayed(() -> {
             // 실행 코드
-            startActivity(new Intent(CarWashProgressActivity.this, MainActivity.class));
-            finish();
-        }, 1000 * 60 * 8);*/
+            Log.d(TAG, "handler text 변경");
+            binding.textView.setText("앞차 세차가 끝나면 결제화면으로 진입합니다.\n\n뒷문이 닫히기 전에 결제 시 세차가 작동하지 않을 수 있습니다.\n\n주의하여 주십시오.");
+        }, 1000 * 20);
         try {
             startWash();
             intent = getIntent();
@@ -74,19 +70,39 @@ public class CarWashProgressActivity extends AppCompatActivity {
     }
 
     private void startWash() throws Throwable {
+        if (!MainApplication.getInstance().isBluetoothConnect()) {
+            MainApplication.getInstance().connectBluetooth();
+        }
         BluetoothInterface.getInstance().write("a");
     }
 
     private WashListener getWashListener() {
+        Log.d(TAG, "getWashListener");
         return () -> {
-            startActivity(new Intent(CarWashProgressActivity.this, MainActivity.class));
-            finish();
-
+            new Thread(() -> {
+                int time = 0;
+                while (true) {
+                    // 코드 작성
+                    try {
+                        Log.d(TAG, "washListener timer" + time);
+                        Thread.sleep(1000);
+                        time += 1;
+                        if (time >= 22) {
+                            runOnUiThread(() -> {
+                                startActivity(new Intent(CarWashProgressActivity.this, MainActivity.class));
+                                finish();
+                            });
+                            break;
+                        }
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
         };
     }
 
     public void saveCardRoomData() {
-
         String cardPay = "카드승인";
         String advancedWash = "고급세차";
 
@@ -169,8 +185,5 @@ public class CarWashProgressActivity extends AppCompatActivity {
 
         // 거래번호, 포인트 카드키
         database.mainDao().insert(dbvo);
-
     }
-
-
 }

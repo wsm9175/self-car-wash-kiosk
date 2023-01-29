@@ -127,6 +127,7 @@
             app:layout_constraintTop_toTopOf="@+id/textView3" />
 
         <LinearLayout
+            android:id="@+id/linearLayout"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:background="#00499d"
@@ -144,6 +145,29 @@
                 android:textAlignment="viewEnd"
                 android:textColor="@color/white"
                 android:textSize="30sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/btn_go_to_home"
+            android:layout_width="220dp"
+            android:layout_height="100dp"
+            android:layout_marginBottom="50dp"
+            android:background="@drawable/button_basic_setting"
+            android:gravity="center"
+            android:onClick="@{() -> activity.intentChoicePayModeActvity()}"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:padding="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/nanumgothicbold"
+                android:text="메인으로"
+                android:textColor="@color/white"
+                android:textSize="50sp" />
+
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

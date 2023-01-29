@@ -20,6 +20,7 @@ import com.hoho.android.usbserial.driver.UsbSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialPort;
 import com.hoho.android.usbserial.driver.UsbSerialProber;
 import com.hoho.android.usbserial.util.SerialInputOutputManager;
+import com.lodong.android.selfcarwashkiosk.MainApplication;
 import com.lodong.android.selfcarwashkiosk.callback.ConnectBluetoothListener;
 import com.lodong.android.selfcarwashkiosk.callback.ConnectSerialListener;
 import com.lodong.android.selfcarwashkiosk.callback.RfidPayListener;
@@ -112,7 +113,7 @@ public class SerialManager implements SerialInputOutputManager.Listener {
             Log.d(TAG, serialDriver.getDevice().getDeviceName());
             
             //-------------------------------------------------------------------------------------여기 경로 확인해서 바꾸기
-         /*   if (serialDriver.getDevice().getDeviceName().contains("/dev/bus/usb/002/")) { //1번
+            /*if (serialDriver.getDevice().getDeviceName().contains("/dev/bus/usb/002/")) { //1번
                 connectSerialDriver = serialDriver;
                 break;
             }*/
@@ -175,6 +176,11 @@ public class SerialManager implements SerialInputOutputManager.Listener {
             Toast.makeText(context, "연결상태를 확인해주세요.", Toast.LENGTH_SHORT).show();
             restart();
             e.printStackTrace();
+        }catch (Exception e){
+            Log.d(TAG, "settingPrice: 연결 안됨확인");
+            connectSerialListener.onFailed();
+            Toast.makeText(context, "RFID 모듈 연결상태를 확인해주세요.", Toast.LENGTH_LONG).show();
+            e.printStackTrace();
         }
     }
 
@@ -184,8 +190,9 @@ public class SerialManager implements SerialInputOutputManager.Listener {
             Log.d(TAG, "RejectCard: 태그 거부하겠다.");
             port.write(CARD_REJECT_TAG, 100);
         } catch (IOException e) {
-
             restart();
+            e.printStackTrace();
+        } catch (Exception e){
             e.printStackTrace();
         }
     }
